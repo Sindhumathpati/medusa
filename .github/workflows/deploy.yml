@@ -1,9 +1,9 @@
-name: Deploy Medusa Application
+name: Deploy Medusa
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
@@ -11,40 +11,23 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          fetch-depth: 0
+          node-version: '20.14.0'
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.9.5  # Change to your desired version
+      - name: Install dependencies
+        run: npm install
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./medusa-terraform  # Adjust to your Terraform configuration directory
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      - name: Deploy to EC2
         env:
-          TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Deploy Medusa Application
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > medusa.pem
+          echo "${PRIVATE_KEY}" > medusa.pem
           chmod 600 medusa.pem
-          ssh -o StrictHostKeyChecking=no -i medusa.pem ubuntu@$EC2_HOST << 'EOF'
-            # Pull the latest image from Docker Hub
-            docker pull sindhumathapati7/my-medusa-app:latest
-            
-            # Stop and remove the existing container if it exists
-            docker stop my-medusa-app || true
-            docker rm my-medusa-app || true
-            
-            # Run the new container with the latest image
-            docker run -d --name my-medusa-app -p 80:7001 -e DATABASE_URL=$DATABASE_URL sindhumathapati7/my-medusa-app:latest
-          EOF
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          EC2_HOST: ${{ secrets.EC2_HOST }}
+          scp -i medusa.pem -o StrictHostKeyChecking=no -r . $USER@$HOST:/home/ubuntu/medusa
+          ssh -i medusapem -o StrictHostKeyChecking=no $USER@$HOST 'cd /home/ubuntu/medusa && npm install && npm run start'
