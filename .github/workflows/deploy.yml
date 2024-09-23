@@ -33,4 +33,4 @@ jobs:
            # Optionally restart your Medusa server
            # npm install
            # npm run start
-          EOF
+        EOF
