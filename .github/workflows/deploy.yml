@@ -26,11 +26,11 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}  # Add this if you're using DATABASE_URL
          run: |
-    ssh -o StrictHostKeyChecking=no -i awsmedusa.pem ubuntu@$EC2_HOST << 'EOF'
-      # Navigate to the correct project directory
-      C:\Users\ADC\Downloads\my-medusa-app  # Ensure this path is correct
-      git pull origin master  # Ensure this is a valid Git repository
-      # Optionally restart your Medusa server
-      # npm install
-      # npm run start
-    EOF
+           ssh -o StrictHostKeyChecking=no -i awsmedusa.pem ubuntu@$EC2_HOST << 'EOF'
+           # Navigate to the correct project directory
+           C:\Users\ADC\Downloads\my-medusa-app  # Ensure this path is correct
+           git pull origin master  # Ensure this is a valid Git repository
+           # Optionally restart your Medusa server
+           # npm install
+           # npm run start
+           EOF
