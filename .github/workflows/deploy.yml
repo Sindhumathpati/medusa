@@ -28,7 +28,7 @@ jobs:
          run: |
            ssh -o StrictHostKeyChecking=no -i awsmedusa.pem ubuntu@$EC2_HOST << 'EOF'
            # Navigate to the correct project directory
-            cd C:\Users\ADC\Downloads\my-medusa-app  # Ensure this path is correct
+           cd C:\Users\ADC\Downloads\my-medusa-app  # Ensure this path is correct
            git pull origin master  # Ensure this is a valid Git repository
            # Optionally restart your Medusa server
            # npm install
