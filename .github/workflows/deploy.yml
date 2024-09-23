@@ -18,8 +18,8 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > medusa12.pem
-          chmod 600 medusa12.pem
+          echo "$SSH_PRIVATE_KEY" > awsmedusa.pem
+          chmod 600 awsmedusa.pem
 
       - name: Deploy to EC2
         env:
@@ -29,7 +29,7 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}  # Add this if you're using DATABASE_URL
         run: |
-          ssh -o StrictHostKeyChecking=no -i medusa12.pem ubuntu@$EC2_HOST << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i awsmedusa.pem ubuntu@$EC2_HOST << 'EOF'
             # Update package index and install Docker if not already installed
             sudo apt-get update -y
             sudo apt-get install -y docker.io
